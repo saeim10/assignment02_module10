@@ -50,99 +50,134 @@ class CourseGrid extends StatelessWidget {
     // Add more as needed
   ];
 
-  @override
+ @override
   Widget build(BuildContext context) {
-    Size screenSize = MediaQuery.of(context).size;
-
+    Size screenSize = MediaQuery
+        .of(context)
+        .size;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         int crossAxisCount = 2;
-        if (constraints.maxWidth > 1024) {
+
+        if (constraints.maxWidth >= 1024) {
           crossAxisCount = 4;
-        } else if ( constraints.maxWidth > 768) {
+        } else if (constraints.maxWidth >= 768) {
           crossAxisCount = 3;
         }
 
-          return GridView.builder(
-            padding: const EdgeInsets.all(10),
+        double itemWidth = constraints.maxWidth / crossAxisCount;
+        double itemHeight1 = screenSize.height / 1.1;
+        double itemHeight2 = screenSize.height / 2.5;
+        double itemHeight3 = screenSize.height / 1.9;
+        double displaySize = screenSize.width > 1024 ? itemHeight1 : (screenSize.width > 768 ? itemHeight3 : itemHeight2);
+        double aspectRatio = itemWidth / displaySize;
 
-            itemCount: courses.length,
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: crossAxisCount,
-              childAspectRatio: 0.58,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-            ),
-            itemBuilder: (context, index) {
-              final course = courses[index];
-              return Card(
+        double _fontSize = screenSize.width > 1024 ? 20.sp : (screenSize.width > 768 ? 18.sp : 15.sp);
 
-                elevation: 4,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: screenSize.height * 0.15,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.vertical(top:Radius.circular(16) )
-                      ),
-                      child: Image.network(
-                        course["image"]!,
-                        height: MediaQuery.of(context).size.height * 0.1,
-                        width: double.infinity,
-                        fit: BoxFit.cover,
-                      ),
+        double iconSize = screenSize.width > 1024 ? 6.sh : (screenSize.width > 768 ? 24 : 14);
+
+
+        return GridView.builder(
+          padding: EdgeInsets.all(10),
+          itemCount: courses.length,
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            childAspectRatio: aspectRatio,
+            crossAxisSpacing: 20,
+            mainAxisSpacing: 20,
+          ),
+          itemBuilder: (context, index) {
+            final course = courses[index];
+
+            return Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.shade300,
+                    offset: Offset(2, 2),
+                    blurRadius: 6,
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16)),
+                    child: Image.network(
+                      course["image"]!,
+                      width: double.infinity,
+                      height: displaySize * 0.4,
+                      fit: BoxFit.cover,
                     ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(course["title"]!, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              const Icon(Icons.groups, size: 14),
-                              const SizedBox(width: 4),
-                              Text(course["classes"]!),
-                            ],
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          course["title"]!,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: _fontSize,
                           ),
-                          Row(
-                            children: [
-                              const Icon(Icons.calendar_today, size: 14),
-                              const SizedBox(width: 4),
-                              Text(course["days"]!),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: () {},
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.grey.shade200,
-                                foregroundColor: Colors.black,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              ),
-                              child: const Text("বিস্তারিত দেখুন"),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 6),
+                        Row(
+                          children: [
+                            Icon(Icons.groups, size: iconSize),
+                            SizedBox(width: 4),
+                            Text(
+                              course["classes"]!,
+                              style: TextStyle(fontSize: _fontSize - 2),
                             ),
-                          )
-                        ],
-                      ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Icon(Icons.calendar_today, size: iconSize),
+                            SizedBox(width: 4),
+                            Text(
+                              course["days"]!,
+                              style: TextStyle(fontSize: _fontSize - 2),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey.shade200,
+                              foregroundColor: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              "বিস্তারিত দেখুন",
+                              style: TextStyle(fontSize: _fontSize - 2),
+                            ),
+                          ),
+                        )
+                      ],
                     ),
-                  ],
-                ),
-              );
-            },
-
+                  ),
+                ],
+              ),
+            );
+          },
         );
       },
-
-
     );
   }
+
 }
